@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smithstown Castle | Luxury Holiday Rental in Kilshanny, Ireland</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f8f8f8;
+      color: #333;
+      overflow-x: hidden;
+    }
+    
+    .video-container {
+      position: relative;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      background-color: #000;
+    }
+    
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+    }
+    
+    /* Fallback if video doesn't load */
+    .video-fallback {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      display: none; /* Only show if JS detects video failure */
+    }
+    
+    .video-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.8));
+      color: white;
+      z-index: 2;
+    }
+    
+    .video-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .video-location {
+      font-size: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .video-location svg {
+      margin-right: 8px;
+    }
+    
+    .video-controls {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      z-index: 2;
+    }
+    
+    .control-button {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .swipe-indicator {
+      position: absolute;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 0.8;
+      animation: bounce 2s infinite;
+      z-index: 2;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0) translateX(-50%);
+      }
+      40% {
+        transform: translateY(-10px) translateX(-50%);
+      }
+      60% {
+        transform: translateY(-5px) translateX(-50%);
+      }
+    }
+    
+    .booking-section, .pricing-section, .testimonial-section, .calendar-section {
+      padding: 30px 20px;
+    }
+    
+    .section-title {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #333;
+    }
+    
+    .property-highlights {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+    
+    .highlight-item {
+      display: flex;
+      align-items: center;
+      background: white;
+      padding: 14px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    
+    .highlight-icon {
+      margin-right: 12px;
+      color: #4a6d7c;
+    }
+    
+    .highlight-text {
+      font-size: 15px;
+    }
+    
+    .property-description {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    
+    .booking-button {
+      display: block;
+      width: 100%;
+      background: #2d6073;
+      color: white;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      margin-top: 24px;
+      box-shadow: 0 4px 12px rgba(45, 96, 115, 0.3);
+    }
+
+    
+    @keyframes spin {
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    
+    /* Error message if video fails to load */
+    .video-error {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      text-align: center;
+      padding: 20px;
+      background-color: rgba(0,0,0,0.7);
+      border-radius: 8px;
+      max-width: 80%;
+      z-index: 3;
+      display: none; /* Only show if video fails to load */
+    }
+
+    /* New Pricing Section Styles */
+    .pricing-table {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .pricing-header {
+      background: #2d6073;
+      color: white;
+      padding: 16px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .pricing-row {
+      display: flex;
+      border-bottom: 1px solid #eee;
+    }
+
+    .pricing-row:last-child {
+      border-bottom: none;
+    }
+
+    .pricing-cell {
+      flex: 1;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .pricing-cell:first-child {
+      text-align: left;
+      font-weight: 500;
+    }
+
+    .pricing-notes {
+      font-size: 14px;
+      color: #666;
+      margin-top: 12px;
+      margin-bottom: 24px;
+    }
+
+    /* Testimonial Slider Styles */
+    .testimonial-slider {
+      position: relative;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      padding: 24px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .testimonial-slides {
+      display: flex;
+      transition: transform 0.4s ease;
+    }
+
+    .testimonial-slide {
+      min-width: 100%;
+      padding: 0 12px;
+    }
+
+    .testimonial-content {
+      font-style: italic;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .testimonial-author {
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .testimonial-rating {
+      color: #f3c614;
+      margin-bottom: 12px;
+      text-align: right;
+    }
+
+    .testimonial-controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 16px;
+    }
+
+    .testimonial-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ddd;
+      margin: 0 5px;
+      cursor: pointer;
+    }
+
+    .testimonial-dot.active {
+      background: #2d6073;
+    }
+
+    .testimonial-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      background: rgba(0,0,0,0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .arrow-prev {
+      left: 10px;
+    }
+
+    .arrow-next {
+      right: 10px;
+    }
+
+    /* Calendar Styles */
+    .calendar-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .calendar-title {
+      font-weight: 600;
+    }
+
+    .calendar-nav {
+      display: flex;
+    }
+
+    .calendar-btn {
+      background: #f0f0f0;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+
+    .calendar-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .calendar-table th {
+      padding: 8px;
+      text-align: center;
+      font-weight: 500;
+      color: #666;
+    }
+
+    .calendar-table td {
+      padding: 8px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .calendar-day {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+    }
+
+    .calendar-day.available {
+      background: #e8f4ea;
+      color: #2c7a39;
+    }
+
+    .calendar-day.unavailable {
+      background: #f9e9e9;
+      color: #c53030;
+      text-decoration: line-through;
+    }
+
+    .calendar-day.other-month {
+      color: #ccc;
+    }
+
+    .calendar-legend {
+      display: flex;
+      justify-content: center;
+      margin-top: 16px;
+      font-size: 14px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin: 0 10px;
+    }
+
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .available-color {
+      background: #e8f4ea;
+    }
+
+    .unavailable-color {
+      background: #f9e9e9;
+    }
+
+    /* Footer Styles */
+    footer {
+      background: #2d6073;
+      color: white;
+      padding: 30px 20px;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .footer-sections {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    @media (min-width: 768px) {
+      .footer-sections {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .footer-section h3 {
+      font-size: 18px;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .footer-links {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: 8px;
+    }
+
+    .footer-links a {
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      color: white;
+      text-decoration: underline;
+    }
+
+    .footer-contact {
+      margin-top: 8px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      color: rgba(255,255,255,0.8);
+    }
+
+    .contact-icon {
+      margin-right: 8px;
+    }
+
+    .footer-divider {
+      height: 1px;
+      background: rgba(255,255,255,0.2);
+      margin: 16px 0;
+    }
+
+    .footer-bottom {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .footer-bottom p {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Full-screen TikTok style video section -->
+  <div class="video-container">
+    <!-- Main video element with multiple sources for compatibility -->
+    <video id="heroVideo" autoplay muted loop playsinline>
+      <!-- Provide multiple sources for better compatibility -->
+      <source src="../capcut-exports/upload/saxophone-v1.mp4" type="video/mp4">
+      <!-- Add WebM as a fallback format if you have it -->
+      <!-- <source src="your-video.webm" type="video/webm"> -->
+      <!-- Browser will try each source until one works -->
+    </video>
+    
+    <!-- Fallback image if video doesn't load -->
+    <img src="" alt="Smithstown Castle" class="video-fallback" id="videoFallback"/>
+    
+    
+    
+    <!-- Error message if video fails -->
+    <div class="video-error" id="videoError">
+      <p>Unable to play video. Please check your connection.</p>
+    </div>
+    
+    <div class="video-overlay">
+      <h1 class="video-title">Smithstown Castle</h1>
+      <div class="video-location">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        Kilshanny, Co. Clare, Ireland
+      </div>
+      
+      <p>Historic castle rental in beautiful Irish countryside</p>
+    </div>
+
+ 
+    
+    <div class="video-controls">
+      <div class="control-button" id="muteToggle">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <line x1="23" y1="9" x2="17" y2="15"></line>
+          <line x1="17" y1="9" x2="23" y2="15"></line>
+        </svg>
+      </div>
+      <div class="control-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+      </div>
+      
+    </div>
+    
+    <div class="swipe-indicator">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <polyline points="19 12 12 19 5 12"></polyline>
+      </svg>
+      <span>Swipe up</span>
+    </div>
+  </div>
+  
+  <!-- Property details section -->
+  <div class="booking-section">
+    <h2 class="section-title">Property Highlights</h2>
+    
+    <div class="property-highlights">
+      <div class="highlight-item">
+        <div class="highlight-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+        </div>
+        <div class="highlight-text">Historic Castle</div>
+      </div>
+      
+      <div class="highlight-item">
+        <div class="highlight-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+        <div class="highlight-text">Sleeps 8</div>
+      </div>
+      
+      <div class="highlight-item">
+        <div class="highlight-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 22h8"></path>
+            <path d="M12 2v20"></path>
+            <path d="M2 12h20"></path>
+            <path d="M2 7h5"></path>
+            <path d="M17 7h5"></path>
+            <path d="M2 17h5"></path>
+            <path d="M17 17h5"></path>
+          </svg>
+        </div>
+        <div class="highlight-text">4 Bedrooms, 3 Bathrooms</div>
+      </div>
+      
+      <div class="highlight-item">
+        <div class="highlight-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </div>
+        <div class="highlight-text">2 Night Min</div>
+      </div>
+    </div>
+    
+    <div class="property-description">
+      <p>Experience the magic of Ireland in this beautifully restored 15th century castle in Kilshanny, County Clare. Smithstown Castle offers authentic medieval charm with modern comforts, set on private grounds with stunning views of the Irish countryside.</p>
+      <p>Just a short drive to the Cliffs of Moher, Burren National Park, and picturesque coastal villages.</p>
+    </div>
+    
+    <a href="#book-now" class="booking-button">Check Availability</a>
+  </div>
+
+  <!-- NEW: Pricing Section -->
+  <div class="pricing-section">
+    <h2 class="section-title">Pricing Information</h2>
+    
+    <div class="pricing-table">
+      <div class="pricing-header">
+        <div class="pricing-row">
+          <div class="pricing-cell">Season</div>
+          <div class="pricing-cell">Weekday Rate Per Person</div>
+          <div class="pricing-cell">Weekend Rate Per Person</div>
+        </div>
+      </div>
+      
+      <div class="pricing-row">
+        <div class="pricing-cell">Low Season (Nov-Mar)</div>
+        <div class="pricing-cell">€81/night</div>
+        <div class="pricing-cell">€90/night</div>
+      </div>
+      
+      <div class="pricing-row">
+        <div class="pricing-cell">Mid Season (Apr-May, Sep-Oct)</div>
+        <div class="pricing-cell">€81/night</div>
+        <div class="pricing-cell">€99/night</div>
+      </div>
+      
+      <div class="pricing-row">
+        <div class="pricing-cell">High Season (Jun-Aug)</div>
+        <div class="pricing-cell">€99/night</div>
+        <div class="pricing-cell">€106/night</div>
+      </div>
+      
+      <div class="pricing-row">
+        <div class="pricing-cell">Holiday Periods</div>
+        <div class="pricing-cell">€106/night</div>
+        <div class="pricing-cell">€119/night</div>
+      </div>
+    </div>
+    
+    <div class="pricing-notes">
+        <p>* Minimum stay of 2 nights required. Holiday periods (Christmas, New Year's, Easter, Bank Holidays) have a 5-night minimum stay.</p>
+        <p>* Rates include basic cleaning service. Additional services available on request.</p>
+      <p>* A refundable security deposit of €1000 is required.</p>
+    </div>
+    
+    <a href="#book-now" class="booking-button">Book Your Stay</a>
+  </div>
+
+
+
+  
+            
+                <script>  
+                    document.getElementById('muteToggle').addEventListener('click', function() {  
+                      var video = document.getElementById('heroVideo');  
+                      video.muted = !video.muted;  
+                    });  
+                  </script> 
+
+                    <!-- NEW: Testimonial Slider Section -->  
+  <div class="testimonial-section">  
+    <h2 class="section-title">Guest Reviews</h2>  
+    <div class="testimonial-slider">  
+      <div class="testimonial-arrow arrow-prev" id="prevTestimonial">  
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">  
+          <polyline points="15 18 9 12 15 6"></polyline>  
+        </svg>  
+      </div>  
+      <div class="testimonial-slides" id="testimonialSlides">  
+        <div class="testimonial-slide">  
+          <div class="testimonial-rating">★★★★★</div>  
+          <div class="testimonial-content">  
+            "Our stay at Smithstown Castle was absolutely magical! The restoration work is incredible, and you really feel like you're stepping back in time while still enjoying modern amenities. The views from the tower are breathtaking, and the surrounding countryside is so peaceful. A perfect family vacation we'll never forget."  
+          </div>  
+          <div class="testimonial-author">- Sarah T., London</div>  
+        </div>  
+        <div class="testimonial-slide">  
+          <div class="testimonial-rating">★★★★★</div>  
+          <div class="testimonial-content">  
+            "We celebrated our anniversary at Smithstown Castle, and it exceeded all expectations. The attention to detail in the restoration is remarkable. The caretaker was so helpful with local recommendations, and we loved exploring the Burren and Cliffs of Moher during the day, then returning to our very own castle each evening. Truly a once-in-a-lifetime experience!"  
+          </div>  
+          <div class="testimonial-author">- James & Elizabeth M., Boston</div>  
+        </div>  
+        <div class="testimonial-slide">  
+          <div class="testimonial-rating">★★★★★</div>  
+          <div class="testimonial-content">  
+            "As a history buff, staying in a genuine 15th-century castle was a dream come true. The owners have done an amazing job preserving its authentic character while making it comfortable for modern guests. The kitchen is well-equipped, beds very comfortable, and the great hall with its massive fireplace was our favorite spot for evening gatherings. Can't recommend it enough!"  
+          </div>  
+          <div class="testimonial-author">- Michael P., Toronto</div>  
+        </div>  
+      </div>  
+      <div class="testimonial-arrow arrow-next" id="nextTestimonial">  
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">  
+          <polyline points="9 18 15 12 9 6"></polyline>  
+        </svg>  
+      </div>  
+      <div class="testimonial-controls" id="testimonialDots">  
+        <div class="testimonial-dot active" data-index="0"></div>  
+        <div class="testimonial-dot" data-index="1"></div>  
+        <div class="testimonial-dot" data-index="2"></div>  
+      </div>  
+    </div>  
+  
+</div>  
+
+  
+
+  <!-- NEW: Availability Calendar Section -->  
+  <div class="calendar-section" id="book-now">  
+    <h2 class="section-title">Check Availability</h2>  
+    <div class="calendar-container">  
+      <div class="calendar-header">  
+        <div class="calendar-title" id="calendarMonth">April 2025</div>  
+        <div class="calendar-nav">  
+          <button class="calendar-btn" id="prevMonth">  
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">  
+              <polyline points="15 18 9 12 15 6"></polyline>  
+            </svg>  
+          </button>  
+          <button class="calendar-btn" id="nextMonth">  
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">  
+              <polyline points="9 18 15 12 9 6"></polyline>  
+            </svg>  
+          </button>  
+        </div>  
+      </div>  
+      <table class="calendar-table">  
+        <thead>  
+          <tr>  
+            <th>Sun</th>  
+            <th>Mon</th>  
+            <th>Tue</th>  
+            <th>Wed</th>  
+            <th>Thu</th>  
+            <th>Fri</th>  
+            <th>Sat</th>  
+          </tr>  
+        </thead>  
+        <tbody id="calendarBody">  
+          <!-- Calendar rows will be generated here -->  
+        </tbody>  
+      </table>  
+    </div>  
+    <a href="#book-now" class="booking-button">Book Your Stay</a>
+
+  </div>  
+  
+  <script>  
+    const calendarBody = document.getElementById('calendarBody');  
+    const calendarMonth = document.getElementById('calendarMonth');  
+    const prevMonthButton = document.getElementById('prevMonth');  
+    const nextMonthButton = document.getElementById('nextMonth');  
+  
+    let currentYear = 2025;  
+    let currentMonth = 3; // April is the 3rd month (zero-indexed)  
+  
+    const availableDays = [1, 2, 3, 5, 6, 9, 10, 12, 13, 16, 17, 19, 20, 23, 24, 26, 27, 30];  
+    const unavailableDays = [4, 7, 8, 11, 14, 15, 18, 21, 22, 25, 28, 29];  
+  
+    function generateCalendar(year, month) {  
+      calendarBody.innerHTML = '';  
+      const firstDay = new Date(year, month, 1).getDay();  
+      const lastDate = new Date(year, month + 1, 0).getDate();  
+      const prevLastDate = new Date(year, month, 0).getDate();  
+  
+      let daysHTML = '';  
+      let dayCount = 1;  
+      let nextMonthDayCount = 1;  
+  
+      for (let i = 0; i < 6; i++) {  
+        let weekHTML = '<tr>';  
+        for (let j = 0; j < 7; j++) {  
+          if (i === 0 && j < firstDay) {  
+            weekHTML += `<td><span class="calendar-day other-month">${prevLastDate - firstDay + j + 1}</span></td>`;  
+          } else if (dayCount > lastDate) {  
+            weekHTML += `<td><span class="calendar-day other-month">${nextMonthDayCount++}</span></td>`;  
+          } else {  
+            const dayClass = availableDays.includes(dayCount) ? 'available' : unavailableDays.includes(dayCount) ? 'unavailable' : '';  
+            weekHTML += `<td><span class="calendar-day ${dayClass}">${dayCount}</span></td>`;  
+            dayCount++;  
+          }  
+        }  
+        weekHTML += '</tr>';  
+        daysHTML += weekHTML;  
+      }  
+  
+      calendarBody.innerHTML = daysHTML;  
+      calendarMonth.textContent = new Date(year, month).toLocaleString('default', { month: 'long', year: 'numeric' });  
+    }  
+  
+    prevMonthButton.addEventListener('click', () => {  
+      currentMonth = (currentMonth === 0) ? 11 : currentMonth - 1;  
+      currentYear = (currentMonth === 11) ? currentYear - 1 : currentYear;  
+      generateCalendar(currentYear, currentMonth);  
+    });  
+  
+    nextMonthButton.addEventListener('click', () => {  
+      currentMonth = (currentMonth === 11) ? 0 : currentMonth + 1;  
+      currentYear = (currentMonth === 0) ? currentYear + 1 : currentYear;  
+      generateCalendar(currentYear, currentMonth);  
+    });  
+  
+    generateCalendar(currentYear, currentMonth);  
+  </script>  
+  
+  <script>  
+    const slides = document.querySelectorAll('.testimonial-slide');  
+    const dots = document.querySelectorAll('.testimonial-dot');  
+    const prevButton = document.getElementById('prevTestimonial');  
+    const nextButton = document.getElementById('nextTestimonial');  
+    let currentIndex = 0;  
+  
+    function updateSlides() {  
+      const slidesContainer = document.getElementById('testimonialSlides');  
+      slidesContainer.style.transform = `translateX(-${currentIndex * 100}%)`;  
+      dots.forEach(dot => dot.classList.remove('active'));  
+      dots[currentIndex].classList.add('active');  
+    }  
+  
+    prevButton.addEventListener('click', () => {  
+      currentIndex = (currentIndex === 0) ? slides.length - 1 : currentIndex - 1;  
+      updateSlides();  
+    });  
+  
+    nextButton.addEventListener('click', () => {  
+      currentIndex = (currentIndex === slides.length - 1) ? 0 : currentIndex + 1;  
+      updateSlides();  
+    });  
+  
+    dots.forEach(dot => {  
+      dot.addEventListener('click', () => {  
+        currentIndex = parseInt(dot.getAttribute('data-index'));  
+        updateSlides();  
+      });  
+    });  
+  </script>  
+
+    <!-- Footer Section -->  
+    <footer>  
+        <div class="footer-content">  
+          <div class="footer-sections">  
+            <div class="footer-section">  
+              <h3>About Smithstown Castle</h3>  
+              <p>Smithstown Castle is a beautifully restored 15th-century castle set in the picturesque countryside of Kilshanny, County Clare, Ireland. Offering a unique blend of medieval charm and modern amenities, it’s the perfect destination for a memorable holiday.</p>  
+            </div>  
+            <div class="footer-section">  
+              <h3>Quick Links</h3>  
+              <ul class="footer-links">  
+                <li><a href="#book-now">Check Availability</a></li>  
+                <li><a href="#pricing">Pricing Information</a></li>  
+                <li><a href="#testimonial">Guest Reviews</a></li>  
+                <li><a href="#contact">Contact Us</a></li>  
+              </ul>  
+            </div>  
+            <div class="footer-section">  
+              <h3>Contact Information</h3>  
+              <div class="footer-contact">  
+                <div class="contact-item">  
+                  
+                  <span>Smithstown Castle, Kilshanny, Co. Clare, Ireland</span>  
+                </div>  
+                <div class="contact-item">  
+                  
+                  <span> +353 123 4567</span>  
+                </div>  
+                <div class="contact-item">  
+                  
+                  <span>info@smithstowncastle.com</span>  
+                </div>  
+              </div>  
+            </div>  
+          </div>  
+          <div class="footer-divider"></div>  
+          <div class="footer-bottom">  
+            <p>&copy; 2023 Smithstown Castle. All rights reserved.</p>  
+          </div>  
+        </div>  
+      </footer>  
+</body>  
+</html>  
